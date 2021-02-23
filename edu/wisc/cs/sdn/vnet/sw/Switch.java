@@ -19,6 +19,11 @@ public class Switch extends Device
 		super(host,logfile);
 	}
 
+	/*
+	 * So apparently we would need a forward table with a timeout function
+	 */
+	HashMap<String, ForwardTableEntry> ForwardTable;
+
 	/**
 	 * Handle an Ethernet packet received on a specific interface.
 	 * @param etherPacket the Ethernet packet that was received
@@ -33,5 +38,9 @@ public class Switch extends Device
 		/* TODO: Handle packets                                             */
 		
 		/********************************************************************/
+		// 1. Add/refresh the forward table
+		// 2. Lookup the forward table for the designated MAC address.
+		//	2.1 If found, check if it is valid.
+		//		2.1.1 Valid, send the frame to such interface and return
 	}
 }
