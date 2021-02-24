@@ -1,8 +1,9 @@
-import net.floodlightcontroller.packet.MACAddress;
+package edu.wisc.cs.sdn.vnet.sw;
+
+// import net.floodlightcontroller.packet.MACAddress;
 import edu.wisc.cs.sdn.vnet.Iface;
 
 public class ForwardTableEntry {
-    // MACAddress macAddress;
     Iface iface;
     long createdAt;
     
