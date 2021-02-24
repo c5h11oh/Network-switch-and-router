@@ -24,7 +24,7 @@ public class Switch extends Device
 	/*
 	 * So apparently we would need a forward table with a timeout function
 	 */
-	HashMap<MACAddress, ForwardTableEntry> ForwardTable;
+	HashMap<MACAddress, ForwardTableEntry> ForwardTable = new HashMap<MACAddress, ForwardTableEntry>();
 
 	/**
 	 * Handle an Ethernet packet received on a specific interface.
