@@ -1,10 +1,14 @@
 package edu.wisc.cs.sdn.vnet.rt;
 
+import java.nio.ByteBuffer;
+import java.util.*;
+
 import edu.wisc.cs.sdn.vnet.Device;
 import edu.wisc.cs.sdn.vnet.DumpFile;
 import edu.wisc.cs.sdn.vnet.Iface;
 
 import net.floodlightcontroller.packet.Ethernet;
+import net.floodlightcontroller.packet.IPv4;
 
 /**
  * @author Aaron Gember-Jacobson and Anubhavnidhi Abhashkumar
@@ -82,10 +86,50 @@ public class Router extends Device
 		System.out.println("*** -> Received packet: " +
 				etherPacket.toString().replace("\n", "\n\t"));
 		
-		/********************************************************************/
 		/* TODO: Handle packets                                             */
+		if (etherPacket.getEtherType() != Ethernet.TYPE_IPv4)
+			return;
 		
+		IPv4 packet = (IPv4)etherPacket.getPayload();
 		
-		/********************************************************************/
+		// Checksum
+		byte[] b = packet.serialize();
+		ByteBuffer bb = ByteBuffer.wrap(b);
+		short lengthInShort = (short)(b.length / 2);
+		int sum = 0;
+		for(int i = 0; i < 5; ++i)
+			sum += (int)bb.getShort();
+		// The (i == 5)-th short is Checksum
+		for(int i = 6; i < lengthInShort; ++i)
+			sum += (int)bb.getShort();
+		sum = ~sum & 0xFFFF;
+		if((short)sum != packet.getChecksum())
+			return;
+		
+		// decrement TTL
+		if(packet.getTtl() <= 1) return;
+		packet.setTtl((byte)(packet.getTtl() - 1));
+
+		// Check if the packet is sent to the router itself - if yes, drop
+		for(Map.Entry<String, Iface> e : this.interfaces.entrySet()){
+			if(e.getValue().getIpAddress() == packet.getDestinationAddress()) return;
+		}
+
+		// Forward
+		packet.setChecksum((short)0);
+		b = packet.serialize(); // recalculate checksum
+		packet.deserialize(b, 0, b.length);		
+		RouteEntry IPEntry = routeTable.lookup(packet.getDestinationAddress());
+		if(IPEntry == null) return;
+		ArpEntry arpEntry = arpCache.lookup(IPEntry.getDestinationAddress());
+		if(arpEntry == null){
+			System.err.println("Abnormal: No entry in ARP. Aborting.");
+			return;
+		}
+		etherPacket.setDestinationMACAddress(arpEntry.getMac().toBytes());
+		etherPacket.setSourceMACAddress(IPEntry.getInterface().getMacAddress().toBytes());
+		etherPacket.setPayload(packet);
+		sendPacket(etherPacket, IPEntry.getInterface());
+		return;
 	}
 }
