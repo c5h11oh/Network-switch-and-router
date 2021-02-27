@@ -46,22 +46,22 @@ public class RouteTable
 			int hostMask = -1;
 			System.out.println("IP:\t" + Integer.toBinaryString(ip));
 			for(RouteEntry r: this.entries){
-				System.out.println("=================== Route Entry Start ===================");
+				// System.out.println("=================== Route Entry Start ===================");
 				int key  = r.getDestinationAddress();
-				System.out.println("Key:\t\t" + binary(key));
+				// System.out.println("Key:\t\t" + binary(key));
 				int mask = r.getMaskAddress();
-				System.out.println("Mask:\t\t" + binary(mask));
-				System.out.println("~mask:\t\t" + binary(~mask));
+				// System.out.println("Mask:\t\t" + binary(mask));
+				// System.out.println("~mask:\t\t" + binary(~mask));
 				int keyMasked = key & mask;
-				System.out.println("keyMasked:\t" + binary(keyMasked));
-				System.out.println("(ip & mask):\t" + binary(ip & mask));
-				System.out.println("hostMask:\t" + binary(hostMask));
+				// System.out.println("keyMasked:\t" + binary(keyMasked));
+				// System.out.println("(ip & mask):\t" + binary(ip & mask));
+				// System.out.println("hostMask:\t" + binary(hostMask));
 				if(keyMasked == (ip & mask) && ((~mask & hostMask) == ~mask)){ // `mask` has shorter "host part" than the current `hostMask` -> `mask` has more precise `network` part -> use current `mask`
 					longestMatch = r;
 					hostMask = ~mask;
-					System.out.println("update longestMatch>>>>>>>>>>>>>");
+					// System.out.println("update longestMatch>>>>>>>>>>>>>");
 				}
-				System.out.println("=================== Route Entry End ===================");
+				// System.out.println("=================== Route Entry End ===================");
 			}
 			return longestMatch;
 		}

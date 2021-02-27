@@ -147,7 +147,7 @@ public class Router extends Device
 		}
 		System.out.println("Printing RouteEntry IPEntry: \n" + IPEntry.toString());
 		
-		ArpEntry arpEntry = arpCache.lookup(IPEntry.getDestinationAddress());
+		ArpEntry arpEntry = arpCache.lookup(packet.getDestinationAddress());
 		if(arpEntry == null){
 			System.err.println("Abnormal: No entry in ARP. Aborting.");
 			return;
