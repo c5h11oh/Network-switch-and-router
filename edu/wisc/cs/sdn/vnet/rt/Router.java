@@ -141,7 +141,12 @@ public class Router extends Device
 		packet.deserialize(b, 0, b.length);		
 		System.out.println("Forwarding packet >>>>>>>>>>>>>>>>>>");
 		RouteEntry IPEntry = routeTable.lookup(packet.getDestinationAddress());
-		if(IPEntry == null) return;
+		if(IPEntry == null){
+			System.err.println("Failure: No entry in IP routeTable. Aborting.");
+			return;
+		}
+		System.out.println("Printing RouteEntry IPEntry: \n" + IPEntry.toString());
+		
 		ArpEntry arpEntry = arpCache.lookup(IPEntry.getDestinationAddress());
 		if(arpEntry == null){
 			System.err.println("Abnormal: No entry in ARP. Aborting.");
