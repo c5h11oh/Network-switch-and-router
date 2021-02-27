@@ -44,9 +44,11 @@ public class RouteTable
 				int key  = r.getDestinationAddress();
 				int mask = r.getMaskAddress();
 				int keyMasked = key & mask;
+				System.out.println("inside route entry loop");
 				if(keyMasked == (ip & mask) && ((~mask) >> (hostPartBits-1) != 0)){
 					longestMatch = r;
 					hostPartBits = ~mask;
+					System.out.println("update longestMatch>>>>>>>>>>>>>");
 				}
 			}
 			return longestMatch;
