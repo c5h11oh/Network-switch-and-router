@@ -39,17 +39,25 @@ public class RouteTable
 		{
 			/* TODO: Find the route entry with the longest prefix match	  */
 			RouteEntry longestMatch = null;
-			int hostPartBits = 32;
+			int hostMask = -1;
+			System.out.println("IP:\t" + Integer.toBinaryString(ip));
 			for(RouteEntry r: this.entries){
+				System.out.println("=================== Route Entry Start ===================");
 				int key  = r.getDestinationAddress();
+				System.out.println("Key:\t" + Integer.toBinaryString(key));
 				int mask = r.getMaskAddress();
+				System.out.println("Mask:\t" + Integer.toBinaryString(mask));
+				System.out.println("~mask:\t" + Integer.toBinaryString(~mask));
 				int keyMasked = key & mask;
-				System.out.println("inside route entry loop");
-				if(keyMasked == (ip & mask) && ((~mask) >> (hostPartBits-1) != 0)){
+				System.out.println("keyMasked:\t" + Integer.toBinaryString(keyMasked));
+				System.out.println("(ip & mask):\t" + Integer.toBinaryString(ip & mask));
+				System.out.println("hostMask:\t" + Integer.toBinaryString(hostMask));
+				if(keyMasked == (ip & mask) && ((~mask & hostMask) == ~mask)){ // `mask` has shorter "host part" than the current `hostMask` -> `mask` has more precise `network` part -> use current `mask`
 					longestMatch = r;
-					hostPartBits = ~mask;
+					hostMask = ~mask;
 					System.out.println("update longestMatch>>>>>>>>>>>>>");
 				}
+				System.out.println("=================== Route Entry End ===================");
 			}
 			return longestMatch;
 		}
