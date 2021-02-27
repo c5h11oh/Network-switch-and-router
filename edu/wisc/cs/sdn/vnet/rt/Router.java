@@ -90,22 +90,28 @@ public class Router extends Device
 		if (etherPacket.getEtherType() != Ethernet.TYPE_IPv4)
 			return;
 		
+		
 		IPv4 packet = (IPv4)etherPacket.getPayload();
 		
 		// Checksum
+		int hLen = packet.getHeaderLength();
 		byte[] b = packet.serialize();
 		ByteBuffer bb = ByteBuffer.wrap(b);
-		short lengthInShort = (short)(b.length / 2);
+		short lengthInShort = (short)(hLen*2);
 		int sum = 0;
 		for(int i = 0; i < 5; ++i)
-			sum += (int)bb.getShort();
+			sum += (int)bb.getShort(i);
 		// The (i == 5)-th short is Checksum
 		for(int i = 6; i < lengthInShort; ++i)
-			sum += (int)bb.getShort();
+			sum += (int)bb.getShort(i);
 		sum = ~sum & 0xFFFF;
-		if((short)sum != packet.getChecksum())
-			return;
 		
+		if((short)sum != packet.getChecksum()){
+		 String s = String.format("sum = %x, checksum = %x",(short)sum, packet.getChecksum());
+		 System.out.println(s);
+			return;
+		}
+		System.out.println("Correct checksum >>>>>>>>>>>>>>>>>>");
 		// decrement TTL
 		if(packet.getTtl() <= 1) return;
 		packet.setTtl((byte)(packet.getTtl() - 1));
@@ -119,6 +125,7 @@ public class Router extends Device
 		packet.setChecksum((short)0);
 		b = packet.serialize(); // recalculate checksum
 		packet.deserialize(b, 0, b.length);		
+		System.out.println("Forwarding packet >>>>>>>>>>>>>>>>>>");
 		RouteEntry IPEntry = routeTable.lookup(packet.getDestinationAddress());
 		if(IPEntry == null) return;
 		ArpEntry arpEntry = arpCache.lookup(IPEntry.getDestinationAddress());
