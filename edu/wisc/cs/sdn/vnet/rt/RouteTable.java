@@ -44,14 +44,14 @@ public class RouteTable
 			for(RouteEntry r: this.entries){
 				System.out.println("=================== Route Entry Start ===================");
 				int key  = r.getDestinationAddress();
-				System.out.println("Key:\t" + Integer.toBinaryString(key));
+				System.out.println("Key:\t" + String.format("%32s",Integer.toBinaryString(key)).replace(' ', '0'));
 				int mask = r.getMaskAddress();
-				System.out.println("Mask:\t" + Integer.toBinaryString(mask));
-				System.out.println("~mask:\t" + Integer.toBinaryString(~mask));
+				System.out.println("Mask:\t" + String.format("%32s",Integer.toBinaryString(mask)).replace(' ', '0'));
+				System.out.println("~mask:\t" + String.format("%32s",Integer.toBinaryString(~mask)).replace(' ', '0'));
 				int keyMasked = key & mask;
-				System.out.println("keyMasked:\t" + Integer.toBinaryString(keyMasked));
-				System.out.println("(ip & mask):\t" + Integer.toBinaryString(ip & mask));
-				System.out.println("hostMask:\t" + Integer.toBinaryString(hostMask));
+				System.out.println("keyMasked:\t" + String.format("%32s",Integer.toBinaryString(keyMasked)).replace(' ', '0'));
+				System.out.println("(ip & mask):\t" + String.format("%32s",Integer.toBinaryString(ip & mask)).replace(' ', '0'));
+				System.out.println("hostMask:\t" + String.format("%32s",Integer.toBinaryString(hostMask)).replace(' ', '0'));
 				if(keyMasked == (ip & mask) && ((~mask & hostMask) == ~mask)){ // `mask` has shorter "host part" than the current `hostMask` -> `mask` has more precise `network` part -> use current `mask`
 					longestMatch = r;
 					hostMask = ~mask;
