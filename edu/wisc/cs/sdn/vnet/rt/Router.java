@@ -97,20 +97,34 @@ public class Router extends Device
 		int hLen = packet.getHeaderLength();
 		byte[] b = packet.serialize();
 		ByteBuffer bb = ByteBuffer.wrap(b);
-		short lengthInShort = (short)(hLen*2);
-		int sum = 0;
-		for(int i = 0; i < 5; ++i)
-			sum += (int)bb.getShort(i);
-		// The (i == 5)-th short is Checksum
-		for(int i = 6; i < lengthInShort; ++i)
-			sum += (int)bb.getShort(i);
-		sum = ~sum & 0xFFFF;
+		// short lengthInShort = (short)(hLen*2);
+		// int sum = 0;
+		// for(int i = 0; i < 5; ++i)
+		// 	sum += (int)bb.getShort(i);
+		// // The (i == 5)-th short is Checksum
+		// for(int i = 6; i < lengthInShort; ++i)
+		// 	sum += (int)bb.getShort(i);
+		// sum = ~sum & 0xFFFF;
 		
-		if((short)sum != packet.getChecksum()){
-		 String s = String.format("sum = %x, checksum = %x",(short)sum, packet.getChecksum());
-		 System.out.println(s);
-			return;
+		// if((short)sum != packet.getChecksum()){
+		//  String s = String.format("sum = %x, checksum = %x",(short)sum, packet.getChecksum());
+		//  System.out.println(s);
+		// 	return;
+		// }
+
+		bb.rewind();
+        int accumulation = 0;
+        for (int i = 0; i < hLen * 2; ++i) {
+            accumulation += 0xffff & bb.getShort();
+            }
+        accumulation = ((accumulation >> 16) & 0xffff) + (accumulation & 0xffff);
+        short sum = (short) (~accumulation & 0xffff);
+		if(sum !=0){
+			String s =  String.format("sum = %x, checksum = %x", sum, packet.getChecksum());
+			System.out.println(s);
+			return; 
 		}
+
 		System.out.println("Correct checksum >>>>>>>>>>>>>>>>>>");
 		// decrement TTL
 		if(packet.getTtl() <= 1) return;
